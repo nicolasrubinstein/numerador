@@ -38,4 +38,4 @@ numberer/
 
 ## Autor
 
-Nicolás Rubinstein
+Nicolás Rubinstein (ayudante alumno)
