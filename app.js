@@ -15,6 +15,7 @@ const expandTextarea = document.getElementById("expand-textarea");
 const expandClose = document.getElementById("expand-close");
 const expandCopy = document.getElementById("expand-copy");
 const expandDownload = document.getElementById("expand-download");
+const toggleComments = document.getElementById("toggle-comments");
 
 let toastTimer = null;
 
@@ -37,28 +38,97 @@ function lineLabel(n, total) {
   return String(n).padStart(width, "0");
 }
 
-function numberLines(code) {
+/* ── Comment stripping ── */
+
+/**
+ * Returns the line with any trailing Python comment removed.
+ * Handles strings (single/double quotes, including escaped chars) so that
+ * a # inside a string literal is not treated as a comment.
+ * Returns null when the entire line is a comment (should be dropped).
+ */
+function stripLineComment(line) {
+  let inString = false;
+  let stringChar = "";
+  let i = 0;
+  while (i < line.length) {
+    const ch = line[i];
+    if (!inString) {
+      if (ch === '"' || ch === "'") {
+        // triple-quote: skip to its closing counterpart on the same line
+        if (line.slice(i, i + 3) === ch.repeat(3)) {
+          const closeIdx = line.indexOf(ch.repeat(3), i + 3);
+          if (closeIdx !== -1) {
+            i = closeIdx + 3;
+            continue;
+          } else {
+            // opening triple-quote with no closing on this line → bail out
+            return line;
+          }
+        }
+        inString = true;
+        stringChar = ch;
+      } else if (ch === "#") {
+        const before = line.slice(0, i).trimEnd();
+        return before === "" ? null : before;
+      }
+    } else {
+      if (ch === "\\") {
+        i += 2; // skip escaped character
+        continue;
+      }
+      if (ch === stringChar) {
+        inString = false;
+      }
+    }
+    i++;
+  }
+  return line;
+}
+
+/**
+ * Numbers lines preserving original positions.
+ * When removeComments is true, comment lines are skipped but their
+ * original line numbers are still counted for zero-padding width,
+ * so the remaining lines keep their real positions.
+ */
+function buildOutput(code, removeComments) {
   const lines = code.split("\n");
   const total = lines.length;
-  return lines
-    .map((line, i) => `${lineLabel(i + 1, total)}  ${line}`)
-    .join("\n");
+  const out = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    let content = lines[i];
+    if (removeComments) {
+      const stripped = stripLineComment(content);
+      if (stripped === null) continue;
+      content = stripped;
+    }
+    out.push(`${lineLabel(i + 1, total)}  ${content}`);
+  }
+
+  return out;
 }
 
 /* ── Core ── */
 
 function process() {
-  const raw = inputEl.value.replace(/^(\s*\n)+|(\n\s*)+$/g, "");
+  let raw = inputEl.value.replace(/^(\s*\n)+|(\n\s*)+$/g, "");
 
   if (!raw.trim()) {
     setStatus("El área de entrada está vacía.", "err");
     return;
   }
 
-  const result = numberLines(raw);
-  outputEl.value = result;
+  const outputLines = buildOutput(raw, toggleComments.checked);
 
-  const lineCount = raw.split("\n").length;
+  if (outputLines.length === 0) {
+    setStatus("El código sólo contenía comentarios.", "err");
+    return;
+  }
+
+  outputEl.value = outputLines.join("\n");
+
+  const lineCount = outputLines.length;
   outputCount.textContent = `${lineCount} línea${lineCount !== 1 ? "s" : ""}`;
 
   setStatus("Procesado correctamente.", "ok");
