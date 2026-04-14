@@ -69,7 +69,7 @@ function stripLineComment(line) {
         stringChar = ch;
       } else if (ch === "#") {
         const before = line.slice(0, i).trimEnd();
-        return before === "" ? null : before;
+        return before;
       }
     } else {
       if (ch === "\\") {
@@ -86,27 +86,17 @@ function stripLineComment(line) {
 }
 
 /**
- * Numbers lines preserving original positions.
- * When removeComments is true, comment lines are skipped but their
- * original line numbers are still counted for zero-padding width,
- * so the remaining lines keep their real positions.
+ * Numbers every line, preserving original positions.
+ * When removeComments is true, comment text is stripped but the line
+ * itself remains (as an empty numbered line) so positions are unchanged.
  */
 function buildOutput(code, removeComments) {
   const lines = code.split("\n");
   const total = lines.length;
-  const out = [];
-
-  for (let i = 0; i < lines.length; i++) {
-    let content = lines[i];
-    if (removeComments) {
-      const stripped = stripLineComment(content);
-      if (stripped === null) continue;
-      content = stripped;
-    }
-    out.push(`${lineLabel(i + 1, total)}  ${content}`);
-  }
-
-  return out;
+  return lines.map((line, i) => {
+    const content = removeComments ? stripLineComment(line) : line;
+    return `${lineLabel(i + 1, total)}  ${content}`;
+  });
 }
 
 /* ── Core ── */
@@ -119,12 +109,12 @@ function process() {
     return;
   }
 
-  const outputLines = buildOutput(raw, toggleComments.checked);
-
-  if (outputLines.length === 0) {
+  if (toggleComments.checked && !raw.split("\n").some((l) => stripLineComment(l) !== "")) {
     setStatus("El código sólo contenía comentarios.", "err");
     return;
   }
+
+  const outputLines = buildOutput(raw, toggleComments.checked);
 
   outputEl.value = outputLines.join("\n");
 
