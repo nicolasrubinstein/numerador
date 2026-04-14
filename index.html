@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Numerador de Código — Herramienta Académica</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header>
+      <div class="logo">
+        <span class="logo-badge">PY</span>
+        Numerador de Código
+      </div>
+      <span class="header-meta"
+        >Desarrollado para la cátedra de 71.20 informática general - ITBA</span
+      >
+    </header>
+
+    <main>
+      <div class="page-title">
+        <h1>Numeración de líneas de código Python</h1>
+        <p>
+          Pegue su código en el panel izquierdo. El sistema numerará cada línea
+          con ceros a la izquierda según el total de líneas del archivo y
+          generará un archivo <code>.py</code> listo para entregar.
+        </p>
+      </div>
+
+      <!-- Action bar (top) -->
+      <div class="action-bar">
+        <button class="btn btn-primary" id="btn-process">
+          &#9654;&nbsp; Procesar código
+        </button>
+        <span class="status" id="status"></span>
+      </div>
+
+      <!-- Two-panel editor -->
+      <div class="panels">
+        <!-- Input -->
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-label">Entrada</span>
+            <span class="line-count" id="input-count"></span>
+          </div>
+          <textarea
+            id="input"
+            spellcheck="false"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+            placeholder="# Pegue su código Python aquí..."
+          ></textarea>
+        </div>
+
+        <!-- Output -->
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-label">Resultado</span>
+            <div class="output-actions">
+              <span class="line-count" id="output-count"></span>
+              <button
+                class="btn btn-secondary"
+                id="btn-expand"
+                disabled
+                title="Ver en pantalla completa"
+              >
+                &#x26F6;&nbsp; Expandir
+              </button>
+              <button class="btn btn-secondary" id="btn-copy" disabled>
+                &#10697;&nbsp; Copiar
+              </button>
+              <button class="btn btn-primary" id="btn-download" disabled>
+                &#8659;&nbsp; Descargar .py
+              </button>
+            </div>
+          </div>
+          <textarea
+            id="output"
+            spellcheck="false"
+            readonly
+            placeholder="El código numerado aparecerá aquí..."
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Info box -->
+      <div class="info-box">
+        <strong>Formato de numeración:</strong> el ancho del número se ajusta
+        automáticamente al total de líneas. Por ejemplo, 9 líneas →
+        <code>1</code>, <code>2</code> … <code>9</code>; 200 líneas →
+        <code>001</code>, <code>002</code> … <code>200</code>. Cada número va
+        seguido de dos espacios antes del contenido de la línea.
+      </div>
+    </main>
+
+    <footer>
+      <span>Herramienta de uso académico · sin almacenamiento de datos</span>
+      <span>El procesamiento ocurre íntegramente en el navegador</span>
+      <span>
+        Por: Nicolás Rubinstein. Código abierto —
+        <a
+          href="https://github.com/nicolasrubinstein/numerador"
+          target="_blank"
+          rel="noopener"
+          >Github</a
+        >
+      </span>
+    </footer>
+
+    <!-- Expand overlay -->
+    <div id="expand-overlay">
+      <div class="expand-modal">
+        <div class="expand-modal-header">
+          <span class="panel-label">Resultado — Vista expandida</span>
+          <div class="output-actions">
+            <button class="btn btn-secondary" id="expand-copy">
+              &#10697;&nbsp; Copiar
+            </button>
+            <button class="btn btn-primary" id="expand-download">
+              &#8659;&nbsp; Descargar .py
+            </button>
+            <button
+              class="btn btn-secondary"
+              id="expand-close"
+              title="Cerrar (Esc)"
+            >
+              &#x2715;&nbsp; Cerrar
+            </button>
+          </div>
+        </div>
+        <textarea id="expand-textarea" spellcheck="false" readonly></textarea>
+      </div>
+    </div>
+
+    <div id="toast"></div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
