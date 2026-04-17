@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Numerador de Código — Herramienta Académica</title>
+    <title>Desenumerador de Código — Herramienta Académica</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
       href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap"
@@ -15,21 +15,22 @@
     <header>
       <div class="logo">
         <span class="logo-badge">PY</span>
-        Numerador de Código
+        Desenumerador de Código
       </div>
       <span class="header-meta"
         >Desarrollado para la cátedra de 71.20 informática general - ITBA</span
       >
-      <a href="alversre.html" class="btn btn-secondary">Desenumerador &rarr;</a>
+      <a href="index.html" class="btn btn-secondary">&larr; Numerador</a>
     </header>
 
     <main>
       <div class="page-title">
-        <h1>Numeración de líneas de código Python</h1>
+        <h1>Eliminación de numeración de líneas</h1>
         <p>
-          Pegue su código en el panel izquierdo. El sistema numerará cada línea
-          con ceros a la izquierda según el total de líneas del archivo y
-          generará un archivo <code>.py</code> listo para entregar.
+          Pegue su código numerado en el panel izquierdo. El sistema eliminará
+          el número de línea de cada línea, sin importar el formato de
+          numeración (con o sin ceros a la izquierda). Las líneas que no estén
+          numeradas se conservan tal cual y se contabilizan en un aviso.
         </p>
       </div>
 
@@ -38,16 +39,11 @@
         <button class="btn btn-primary" id="btn-process">
           &#9654;&nbsp; Procesar código
         </button>
-        <label class="toggle-label">
-          <input type="checkbox" id="toggle-comments" checked />
-          <span class="toggle-switch"></span>
-          Eliminar comentarios
-        </label>
-        <span class="toggle-hint"
-          >las líneas con comentarios quedan vacías</span
-        >
         <span class="status" id="status"></span>
       </div>
+
+      <!-- Warning box (hidden until needed) -->
+      <div class="warning-box" id="warning-box" style="display: none"></div>
 
       <!-- Two-panel editor -->
       <div class="panels">
@@ -63,7 +59,7 @@
             autocomplete="off"
             autocorrect="off"
             autocapitalize="off"
-            placeholder="# Pegue su código Python aquí..."
+            placeholder="# Pegue su código numerado aquí..."
           ></textarea>
         </div>
 
@@ -93,18 +89,18 @@
             id="output"
             spellcheck="false"
             readonly
-            placeholder="El código numerado aparecerá aquí..."
+            placeholder="El código sin numeración aparecerá aquí..."
           ></textarea>
         </div>
       </div>
 
       <!-- Info box -->
       <div class="info-box">
-        <strong>Formato de numeración:</strong> el ancho del número se ajusta
-        automáticamente al total de líneas. Por ejemplo, 9 líneas →
-        <code>1</code>, <code>2</code> … <code>9</code>; 200 líneas →
-        <code>001</code>, <code>002</code> … <code>200</code>. Cada número va
-        seguido de dos espacios antes del contenido de la línea.
+        <strong>Formatos reconocidos:</strong> el sistema detecta cualquier
+        línea que comience con uno o más dígitos seguidos de espacios —
+        <code>1 código</code>, <code>01 código</code>, <code>001 código</code>
+        — y elimina ese prefijo. Las líneas que no sigan ese patrón se conservan
+        sin cambios y quedan registradas en el aviso de advertencia.
       </div>
     </main>
 
@@ -149,6 +145,19 @@
 
     <div id="toast"></div>
 
-    <script src="app.js"></script>
+    <style>
+      .warning-box {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-left: 3px solid #f59e0b;
+        border-radius: 6px;
+        padding: 0.9rem 1.1rem;
+        font-size: 0.8rem;
+        color: #fcd34d;
+        line-height: 1.7;
+        font-family: var(--mono);
+      }
+    </style>
+    <script src="./deEnumerationHelper.js"></script>
   </body>
 </html>
