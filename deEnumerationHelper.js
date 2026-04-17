@@ -14,6 +14,7 @@ const expandTextarea = document.getElementById("expand-textarea");
 const expandClose = document.getElementById("expand-close");
 const expandCopy = document.getElementById("expand-copy");
 const expandDownload = document.getElementById("expand-download");
+const toggleComments = document.getElementById("toggle-comments");
 
 let toastTimer = null;
 
@@ -38,22 +39,28 @@ const NUMBERED_RE = /^(\d+)\s+/;
 
 /**
  * Strips the leading line-number prefix from a line.
- * Returns { content: string, wasNumbered: boolean }.
+ * Returns { content: string, wasNumbered: boolean, lineNum: string }.
  */
 function denumarateLine(line) {
   const match = line.match(NUMBERED_RE);
   if (match) {
-    return { content: line.slice(match[0].length), wasNumbered: true };
+    return { content: line.slice(match[0].length), wasNumbered: true, lineNum: match[1] };
   }
-  return { content: line, wasNumbered: false };
+  return { content: line, wasNumbered: false, lineNum: null };
 }
 
-function buildOutput(code) {
+function buildOutput(code, asComments) {
   const lines = code.split("\n");
   let unnumbered = 0;
   const out = lines.map((line) => {
-    const { content, wasNumbered } = denumarateLine(line);
-    if (!wasNumbered) unnumbered++;
+    const { content, wasNumbered, lineNum } = denumarateLine(line);
+    if (!wasNumbered) {
+      unnumbered++;
+      return content;
+    }
+    if (asComments) {
+      return content + "  # " + lineNum;
+    }
     return content;
   });
   return { lines: out, unnumbered };
@@ -69,7 +76,7 @@ function process() {
     return;
   }
 
-  const { lines, unnumbered } = buildOutput(raw);
+  const { lines, unnumbered } = buildOutput(raw, toggleComments.checked);
 
   outputEl.value = lines.join("\n");
 
