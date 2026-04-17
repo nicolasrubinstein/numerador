@@ -33,7 +33,10 @@ Toma código Python sin numerar y genera una versión con cada línea precedida 
 numberer/
 ├── index.html   # Estructura de la página
 ├── styles.css   # Estilos visuales
-└── app.js       # Lógica de numeración y eventos
+├── app.js       # Lógica de numeración y eventos
+└── deEnumeratrionHelper.js       # Lógica de desenumeración
+
+
 ```
 
 ## Autor
