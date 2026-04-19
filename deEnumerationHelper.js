@@ -34,8 +34,9 @@ function setStatus(msg, type = "") {
 
 /* ── De-enumeration ── */
 
-// Matches a line prefix of one or more digits followed by one or more spaces.
-const NUMBERED_RE = /^(\d+)\s+/;
+// Matches digits followed by a separator: 2 spaces (enumerator output), a tab, or 1 space.
+// Tried in that order so the 2-space separator is consumed exactly, leaving content indentation intact.
+const NUMBERED_RE = /^(\d+)(  |\t| )/;
 
 /**
  * Strips the leading line-number prefix from a line.
@@ -52,14 +53,19 @@ function denumarateLine(line) {
 function buildOutput(code, asComments) {
   const lines = code.split("\n");
   let unnumbered = 0;
-  const out = lines.map((line) => {
-    const { content, wasNumbered, lineNum } = denumarateLine(line);
+  const parsed = lines.map((line) => denumarateLine(line));
+
+  const maxLen = asComments
+    ? Math.max(...parsed.map(({ content }) => content.length))
+    : 0;
+
+  const out = parsed.map(({ content, wasNumbered, lineNum }) => {
     if (!wasNumbered) {
       unnumbered++;
       return content;
     }
     if (asComments) {
-      return content + "  # " + lineNum;
+      return content.padEnd(maxLen) + "  # " + lineNum;
     }
     return content;
   });
